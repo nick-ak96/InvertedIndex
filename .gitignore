@@ -1,0 +1,4 @@
+*.xcodeproj
+*.xcodeproji/*
+*.swp
+*.o
