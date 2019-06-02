@@ -40,7 +40,7 @@ std::bitset<ALPHABET_SIZE>* create_set_from_string(const std::string &set_string
 	std::string el;
 	std::istringstream stream(set_string);
 	while (std::getline(stream, el, delimiter)) {
-		set->set(std::stoi(el));
+		set->set(std::stoi(el) - 1);
 	}
 	return set;
 }
