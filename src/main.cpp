@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <memory>
 #include "inverted_index.hpp"
 
 
