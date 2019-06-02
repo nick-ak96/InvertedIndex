@@ -10,6 +10,7 @@
 #include <sstream>
 #include <chrono>
 #include <algorithm>
+#include <limits>
 
 
 bool posting_comparator(const Posting &p1, const Posting &p2) {
@@ -113,7 +114,7 @@ bool InvertedIndex::superset_exists(const std::bitset<ALPHABET_SIZE> &test_set) 
 	// get lists of postings for each value in the set
 	std::vector<std::vector<Posting>*> temp = std::vector<std::vector<Posting>*>();
 	std::unordered_map<int, std::vector<Posting>>::iterator it;
-	size_t min_posting_size = INT_MAX,
+	size_t min_posting_size = std::numeric_limits<int>::max(),
 		min_posting_position = 0;
 	for (int i = 0; i < ALPHABET_SIZE; i++) {
 		if (test_set[i]) {
@@ -137,7 +138,7 @@ bool InvertedIndex::exists(const std::bitset<ALPHABET_SIZE> &test_set) {
 	// get lists of postings for each value in the set
 	std::vector<std::vector<Posting>*> temp = std::vector<std::vector<Posting>*>();
 	std::unordered_map<int, std::vector<Posting>>::iterator it;
-	size_t min_posting_size = INT_MAX,
+	size_t min_posting_size = std::numeric_limits<int>::max(),
 	min_posting_position = 0;
 	for (int i = 0; i < ALPHABET_SIZE; i++) {
 		if (test_set[i]) {
