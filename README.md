@@ -22,7 +22,7 @@ and you will get the **inverted_index** executable.
 
 ## Running the program
 
-###Arguments
+### Arguments
 
 ##### Input file
 
