@@ -188,7 +188,8 @@ std::string InvertedIndex::run_test(const std::string &set_string, const std::st
 		stop = std::chrono::system_clock::now();
 	}
 	return
-		set_string + ";" +
-		std::to_string(result) + ";" +
-		std::to_string(calculate_time<std::chrono::nanoseconds>(start, stop));
+		"set=" + set_string + ";" +
+		"val=" + (result ? "true" : "false") + ";" +
+		"cnt=0;" + // hardcoded value just to keep the format
+		"mic=" + std::to_string(calculate_time<std::chrono::microseconds>(start, stop));
 }
