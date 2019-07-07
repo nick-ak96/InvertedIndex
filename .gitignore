@@ -2,3 +2,4 @@
 *.xcodeproji/*
 *.swp
 *.o
+src/inverted_index
