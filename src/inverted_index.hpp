@@ -28,7 +28,9 @@ private:
 	void add_posting(const Posting *posting);
 	
 	bool subset_exists(const std::bitset<ALPHABET_SIZE> &test_set);
+	size_t subset_get_all(const std::bitset<ALPHABET_SIZE> &test_set);
 	bool superset_exists(const std::bitset<ALPHABET_SIZE> &test_set);
+	size_t superset_get_all(const std::bitset<ALPHABET_SIZE> &test_set);
 	bool exists(const std::bitset<ALPHABET_SIZE> &test_set);
 public:
 	void insert_set(const std::string &set_string);

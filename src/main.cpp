@@ -21,7 +21,11 @@ int main(int argc, const char * argv[]) {
 	}
 	// check the mode
 	std::string test_mode = argv[2];
-	if (test_mode.compare("sb") != 0 && test_mode.compare("eq") != 0 && test_mode.compare("sp") != 0) {
+	if (test_mode.compare("sb") != 0 &&
+			test_mode.compare("asb") != 0 &&
+			test_mode.compare("eq") != 0 &&
+			test_mode.compare("sp") != 0 &&
+			test_mode.compare("asp") != 0) {
 		std::cerr<<"Invalid test mode. Supported modes: sb, eq, sp"<<std::endl;
 		return EXIT_FAILURE;
 	}

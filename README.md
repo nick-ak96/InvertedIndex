@@ -5,8 +5,10 @@
 The inverted index supports existence queries, such as
 
 - *Subset existence* - check if a subset of a query set exists in the index.
+- *All subset retrieval* - retrieves all the subsets of a query set from the index.
 - *Set existence* - check if a query set exists in the index.
 - *Superset existence* - check if a superset of a query set exists in the index.
+- *All superset retrieval* - retrieves all the supersets of a query set from the index.
 
 ## Compiling binaries
 
@@ -38,7 +40,7 @@ The file with test query sets must be provided as the first argument. The test f
 
 ##### Experiment mode
 
-The second argument is the test mode, which can be either **sb** (subset existence query), **eq** (equality existence query) or **sp** (superset existence query).
+The second argument is the test mode, which can be either **sb** (subset existence query), **asb** (all subsets retrival query), **eq** (equality existence query), **sp** (superset existence query) or **asp** (all supersets retrival query).
 
 ##### Result file
 
@@ -55,7 +57,9 @@ The result of the tests is outputed to the standard output, so it can be easily 
 The output of the program is constructed as follows. Each test query corresponds to a line in the result ouput. Each line contains:
 
 - A query set (elements of a set are delimited with a coma ',');
-- A result of the query: 0 - false, 1 - true;
+- A result of: 
+	- sb, eq, sp queries: val=true/false;
+	- asb, asp queries: sets=number\_of\_sets;
 - Time taken in nanoseconds.
 
 The data in each line is delimited with a semicolon ';'. Lines are delimited with system specific line ending character.

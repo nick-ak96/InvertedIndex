@@ -45,6 +45,17 @@ std::bitset<ALPHABET_SIZE>* create_set_from_string(const std::string &set_string
 	return set;
 }
 
+std::string create_string_from_set(const std::bitset<ALPHABET_SIZE> &set) {
+	std::string result;
+	for (size_t i = 0; i < set.size(); i++) {
+		if (!set.test(i))
+			continue;
+		result += std::to_string(i) + ",";
+	}
+	result.pop_back();
+	return result;
+}
+
 
 Posting* create_posting(const std::string &set_string) {
 	Posting* posting = new Posting();
@@ -61,11 +72,12 @@ void InvertedIndex::insert_set(const std::string &set_string) {
 
 
 // ---------------------------------------------------------------------------
-// BENCHMARK
+// Main functions
 // ---------------------------------------------------------------------------
 
-std::vector<Posting>* intersect_postings(const std::vector<std::vector<Posting>*> &postings, const size_t &position) {
-	auto smallest_posting_list = postings.at(position);
+// helper function
+size_t intersect_postings(const std::vector<std::vector<Posting>*> &postings, const size_t &position) {
+	std::vector<Posting>* smallest_posting_list = postings.at(position);
 	std::vector<Posting> intersection = std::vector<Posting>();
 	for (int i = 0; i < postings.size(); i++) {
 		intersection.clear();
@@ -78,10 +90,12 @@ std::vector<Posting>* intersect_postings(const std::vector<std::vector<Posting>*
 			smallest_posting_list = new std::vector<Posting>(intersection);
 		}
 	}
-	return new std::vector<Posting>(intersection);
+	delete smallest_posting_list;
+	return intersection.size();
 }
 
 
+/* Existence of subset */
 bool InvertedIndex::subset_exists(const std::bitset<ALPHABET_SIZE> &test_set) {
 	std::unordered_map<std::bitset<ALPHABET_SIZE>, int> hasher = std::unordered_map<std::bitset<ALPHABET_SIZE>, int>();
 	std::unordered_map<int, std::vector<Posting>>::iterator it;
@@ -110,6 +124,37 @@ bool InvertedIndex::subset_exists(const std::bitset<ALPHABET_SIZE> &test_set) {
 }
 
 
+/* Get all subsets */
+size_t InvertedIndex::subset_get_all(const std::bitset<ALPHABET_SIZE> &test_set) {
+	std::unordered_map<std::bitset<ALPHABET_SIZE>, int> hasher = std::unordered_map<std::bitset<ALPHABET_SIZE>, int>();
+	std::unordered_map<int, std::vector<Posting>>::iterator it;
+	for (int i = 0; i < ALPHABET_SIZE; i++) {
+		if (test_set[i]) {
+			it = this->index.find(i);
+			if (it == index.end()) {
+				continue; // some elements of the query set can be skiped, since we search for subsets
+			}
+			for (auto &el : it->second) {
+				auto hasher_it = hasher.find(el.data);
+				if (hasher_it != hasher.end()) {
+					hasher_it->second++;
+				}
+				else {
+					hasher.insert(std::make_pair(el.data, 1));
+				}
+			}
+		}
+	}
+	size_t result = 0;
+	for (auto &el : hasher) {
+		if (el.first.count() == el.second)
+			result++;
+	}
+	return result;
+}
+
+
+/* Existence of supersets */
 bool InvertedIndex::superset_exists(const std::bitset<ALPHABET_SIZE> &test_set) {
 	// get lists of postings for each value in the set
 	std::vector<std::vector<Posting>*> temp = std::vector<std::vector<Posting>*>();
@@ -129,11 +174,35 @@ bool InvertedIndex::superset_exists(const std::bitset<ALPHABET_SIZE> &test_set) 
 			}
 		}
 	}
-	std::vector<Posting>* intersection = intersect_postings(temp, min_posting_position);
-	return intersection->size() > 0;
+	return intersect_postings(temp, min_posting_position) > 0;
 }
 
 
+/* Get all supersets */
+size_t InvertedIndex::superset_get_all(const std::bitset<ALPHABET_SIZE> &test_set) {
+	// get lists of postings for each value in the set
+	std::vector<std::vector<Posting>*> temp = std::vector<std::vector<Posting>*>();
+	std::unordered_map<int, std::vector<Posting>>::iterator it;
+	size_t min_posting_size = std::numeric_limits<int>::max(),
+	min_posting_position = 0;
+	for (int i = 0; i < ALPHABET_SIZE; i++) {
+		if (test_set[i]) {
+			it = this->index.find(i);
+			if (it == index.end()) {
+				return 0;
+			}
+			temp.push_back(&(it->second));
+			if (it->second.size() < min_posting_size) {
+				min_posting_size = it->second.size();
+				min_posting_position = temp.size() - 1;
+			}
+		}
+	}
+	return intersect_postings(temp, min_posting_position);
+}
+
+
+/* Set existence */
 bool InvertedIndex::exists(const std::bitset<ALPHABET_SIZE> &test_set) {
 	// get lists of postings for each value in the set
 	std::vector<std::vector<Posting>*> temp = std::vector<std::vector<Posting>*>();
@@ -161,6 +230,10 @@ bool InvertedIndex::exists(const std::bitset<ALPHABET_SIZE> &test_set) {
 }
 
 
+// ---------------------------------------------------------------------------
+// Benchmark
+// ---------------------------------------------------------------------------
+
 template<typename TUnits>
 long calculate_time(const std::chrono::system_clock::time_point &start, const std::chrono::system_clock::time_point &stop) {
 	return std::chrono::duration_cast<TUnits>(stop - start).count();
@@ -168,18 +241,30 @@ long calculate_time(const std::chrono::system_clock::time_point &start, const st
 
 
 std::string InvertedIndex::run_test(const std::string &set_string, const std::string &test_mode) {
-	bool result;
+	std::string result;
 	auto test_set = create_set_from_string(set_string);
 	std::chrono::system_clock::time_point start, stop;
 	
-	if (test_mode.compare("sb") == 0) {
+	if (test_mode.compare("asb") == 0) {
 		start = std::chrono::system_clock::now();
-		result = subset_exists(*test_set);
+		auto sets = subset_get_all(*test_set);
 		stop = std::chrono::system_clock::now();
+		result = "sets=" + std::to_string(sets) + ";";
+	}
+	else if (test_mode.compare("sb") == 0) {
+		start = std::chrono::system_clock::now();
+		result = subset_exists(*test_set) ? "val=true;" : "val=false;";
+		stop = std::chrono::system_clock::now();
+	}
+	else if (test_mode.compare("asp") == 0) {
+		start = std::chrono::system_clock::now();
+		auto sets = superset_get_all(*test_set);
+		stop = std::chrono::system_clock::now();
+		result = "sets=" + std::to_string(sets) + ";";
 	}
 	else if (test_mode.compare("sp") == 0) {
 		start = std::chrono::system_clock::now();
-		result = superset_exists(*test_set);
+		result = superset_exists(*test_set) ? "val=true;" : "val=false;";
 		stop = std::chrono::system_clock::now();
 	}
 	else {
@@ -189,7 +274,7 @@ std::string InvertedIndex::run_test(const std::string &set_string, const std::st
 	}
 	return
 		"set=" + set_string + ";" +
-		"val=" + (result ? "true" : "false") + ";" +
+		result +
 		"cnt=0;" + // hardcoded value just to keep the format
 		"mic=" + std::to_string(calculate_time<std::chrono::microseconds>(start, stop));
 }
