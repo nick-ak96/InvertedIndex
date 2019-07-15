@@ -87,10 +87,10 @@ size_t intersect_postings(const std::vector<std::vector<Posting>*> &postings, co
 		if (intersection.size() == 0)
 			break;
 		else if (intersection.size() > 0 && intersection.size() < smallest_posting_list->size()) {
-			smallest_posting_list = new std::vector<Posting>(intersection);
+			std::vector<Posting> temp = std::vector<Posting>(intersection);
+			smallest_posting_list = &temp;
 		}
 	}
-	delete smallest_posting_list;
 	return intersection.size();
 }
 
