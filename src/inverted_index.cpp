@@ -276,5 +276,5 @@ std::string InvertedIndex::run_test(const std::string &set_string, const std::st
 		"set=" + set_string + ";" +
 		result +
 		"cnt=0;" + // hardcoded value just to keep the format
-		"mic=" + std::to_string(calculate_time<std::chrono::microseconds>(start, stop));
+		"nsc=" + std::to_string(calculate_time<std::chrono::nanoseconds>(start, stop));
 }
