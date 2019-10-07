@@ -2,8 +2,9 @@
 
 ## Supported operations
 
-The inverted index supports existence queries, such as
+The inverted index supports set-containment queries, such as
 
+- *Set existence* - checks if a set that is equal to a query set exists in the index.
 - *Subset existence* - check if a subset of a query set exists in the index.
 - *All subset retrieval* - retrieves all the subsets of a query set from the index.
 - *Set existence* - check if a query set exists in the index.
@@ -61,5 +62,6 @@ The output of the program is constructed as follows. Each test query corresponds
 	- sb, eq, sp queries: val=true/false;
 	- asb, asp queries: sets=number\_of\_sets;
 - Time taken in nanoseconds.
+- A semicolon ';' that closes the record.
 
-The data in each line is delimited with a semicolon ';'. Lines are delimited with system specific line ending character.
+Lines are delimited with system specific line ending character.
