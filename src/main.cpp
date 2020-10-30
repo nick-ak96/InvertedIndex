@@ -32,12 +32,10 @@ int main(int argc, const char * argv[]) {
 	
 	std::unique_ptr<InvertedIndex> index = std::make_unique<InvertedIndex>();
 	// fill index from stdin
-    int countLoaded = 0;
 	try {
 		std::string input_set;
 		while (std::getline(std::cin, input_set)) {
 			index->insert_set(input_set);
-            countLoaded++;
 		}
         index->sort_postings();
 	} catch (...) {

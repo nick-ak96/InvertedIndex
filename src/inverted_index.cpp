@@ -70,11 +70,9 @@ void InvertedIndex::insert_set(const std::string &set_string) {
 }
 
 void InvertedIndex::sort_postings() {
-    int sortedPostingLists = 0;
     std::unordered_map<int, std::vector<Posting>>::iterator it;
     for (it = this->index.begin(); it != this->index.end(); it++){
         sort(it->second.begin(), it->second.end(), posting_comparator);
-        sortedPostingLists++;
     }
 }
 
