@@ -34,6 +34,7 @@ private:
 	bool exists(const std::bitset<ALPHABET_SIZE> &test_set);
 public:
 	void insert_set(const std::string &set_string);
+    void sort_postings();
 	std::string run_test(const std::string &set_string, const std::string &test_mode);
 };
 

@@ -28,7 +28,6 @@ void InvertedIndex::add_posting(const Posting *posting) {
 				std::vector<Posting> postings = { *posting };
 				this->index.insert(std::make_pair(i, postings));
 			}
-			sort(std::begin(this->index.at(i)), std::end(this->index.at(i)), posting_comparator);
 		}
 	}
 }
@@ -68,6 +67,15 @@ Posting* create_posting(const std::string &set_string) {
 void InvertedIndex::insert_set(const std::string &set_string) {
 	auto posting = create_posting(set_string);
 	this->add_posting(posting);
+}
+
+void InvertedIndex::sort_postings() {
+    int sortedPostingLists = 0;
+    std::unordered_map<int, std::vector<Posting>>::iterator it;
+    for (it = this->index.begin(); it != this->index.end(); it++){
+        sort(it->second.begin(), it->second.end(), posting_comparator);
+        sortedPostingLists++;
+    }
 }
 
 
