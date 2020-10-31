@@ -14,7 +14,12 @@
 
 
 bool posting_comparator(const Posting &p1, const Posting &p2) {
-	return p1.data.to_ullong() < p2.data.to_ullong();
+    for (int i = ALPHABET_SIZE - 1; i >= 0; i--) {
+        if (p1.data[i] ^ p2.data[i])
+            return p2.data[i];
+    }
+    return false;
+	//return p1.data.to_ullong() < p2.data.to_ullong();
 }
 
 void InvertedIndex::add_posting(const Posting *posting) {
