@@ -245,43 +245,44 @@ bool InvertedIndex::exists(const std::bitset<ALPHABET_SIZE> &test_set) {
 // Benchmark
 // ---------------------------------------------------------------------------
 
+typedef std::chrono::high_resolution_clock Clock;
+
 template<typename TUnits>
-long calculate_time(const std::chrono::system_clock::time_point &start, const std::chrono::system_clock::time_point &stop) {
+long calculate_time(const Clock::time_point &start, const Clock::time_point &stop) {
 	return std::chrono::duration_cast<TUnits>(stop - start).count();
 }
-
 
 std::string InvertedIndex::run_test(const std::string &set_string, const std::string &test_mode) {
 	std::string result;
 	auto test_set = create_set_from_string(set_string);
-	std::chrono::system_clock::time_point start, stop;
+	Clock::time_point start, stop;
 	
 	if (test_mode.compare("asb") == 0) {
-		start = std::chrono::system_clock::now();
+		start = Clock::now();
 		auto sets = subset_get_all(*test_set);
-		stop = std::chrono::system_clock::now();
+		stop = Clock::now();
 		result = "sets=" + std::to_string(sets) + ";";
 	}
 	else if (test_mode.compare("sb") == 0) {
-		start = std::chrono::system_clock::now();
+		start = Clock::now();
 		result = subset_exists(*test_set) ? "val=true;" : "val=false;";
-		stop = std::chrono::system_clock::now();
+		stop = Clock::now();
 	}
 	else if (test_mode.compare("asp") == 0) {
-		start = std::chrono::system_clock::now();
+		start = Clock::now();
 		auto sets = superset_get_all(*test_set);
-		stop = std::chrono::system_clock::now();
+		stop = Clock::now();
 		result = "sets=" + std::to_string(sets) + ";";
 	}
 	else if (test_mode.compare("sp") == 0) {
-		start = std::chrono::system_clock::now();
+		start = Clock::now();
 		result = superset_exists(*test_set) ? "val=true;" : "val=false;";
-		stop = std::chrono::system_clock::now();
+		stop = Clock::now();
 	}
 	else {
-		start = std::chrono::system_clock::now();
+		start = Clock::now();
 		result = exists(*test_set);
-		stop = std::chrono::system_clock::now();
+		stop = Clock::now();
 	}
 	return
 		"set=" + set_string + ";" +
