@@ -11,6 +11,7 @@
 #include <chrono>
 #include <algorithm>
 #include <limits>
+#include <time.h>
 
 
 bool posting_comparator(const Posting &p1, const Posting &p2) {
@@ -252,41 +253,66 @@ long calculate_time(const Clock::time_point &start, const Clock::time_point &sto
 	return std::chrono::duration_cast<TUnits>(stop - start).count();
 }
 
+void timespec_diff(struct timespec *stop, struct timespec *start,
+		struct timespec *result) {
+	result->tv_sec  = stop->tv_sec  - start->tv_sec;
+	result->tv_nsec = stop->tv_nsec - start->tv_nsec;
+	if (result->tv_nsec < 0) {
+		--result->tv_sec;
+		result->tv_nsec += 1000000000L;
+	}
+}
+
+
 std::string InvertedIndex::run_test(const std::string &set_string, const std::string &test_mode) {
 	std::string result;
 	auto test_set = create_set_from_string(set_string);
-	Clock::time_point start, stop;
+	struct timespec start, stop, res;
+	//Clock::time_point start, stop;
 	
 	if (test_mode.compare("asb") == 0) {
-		start = Clock::now();
-		auto sets = subset_get_all(*test_set);
-		stop = Clock::now();
+		//start = Clock::now();
+		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+		size_t sets = subset_get_all(*test_set);
+		//stop = Clock::now();
+		clock_gettime(CLOCK_MONOTONIC_RAW, &stop);
 		result = "sets=" + std::to_string(sets) + ";";
 	}
 	else if (test_mode.compare("sb") == 0) {
-		start = Clock::now();
-		result = subset_exists(*test_set) ? "val=true;" : "val=false;";
-		stop = Clock::now();
+		//start = Clock::now();
+		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+		bool sb_res = subset_exists(*test_set);
+		//stop = Clock::now();
+		clock_gettime(CLOCK_MONOTONIC_RAW, &stop);
+		result = sb_res ? "val=true;" : "val=false;";
 	}
 	else if (test_mode.compare("asp") == 0) {
-		start = Clock::now();
-		auto sets = superset_get_all(*test_set);
-		stop = Clock::now();
+		//start = Clock::now();
+		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+		size_t sets = superset_get_all(*test_set);
+		//stop = Clock::now();
+		clock_gettime(CLOCK_MONOTONIC_RAW, &stop);
 		result = "sets=" + std::to_string(sets) + ";";
 	}
 	else if (test_mode.compare("sp") == 0) {
-		start = Clock::now();
-		result = superset_exists(*test_set) ? "val=true;" : "val=false;";
-		stop = Clock::now();
+		//start = Clock::now();
+		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
+		bool sp_res = superset_exists(*test_set);
+		//stop = Clock::now();
+		clock_gettime(CLOCK_MONOTONIC_RAW, &stop);
+		result = sp_res ? "val=true;" : "val=false;";
 	}
 	else {
-		start = Clock::now();
+		//start = Clock::now();
+		clock_gettime(CLOCK_MONOTONIC_RAW, &start);
 		result = exists(*test_set);
-		stop = Clock::now();
+		//stop = Clock::now();
+		clock_gettime(CLOCK_MONOTONIC_RAW, &stop);
 	}
+	timespec_diff(&stop, &start, &res);
 	return
 		"set=" + set_string + ";" +
 		result +
 		"cnt=0;" + // hardcoded value just to keep the format
-		"nsc=" + std::to_string(calculate_time<std::chrono::nanoseconds>(start, stop));
+		"nsc=" + std::to_string((unsigned long)(res.tv_sec * 1e+9 + res.tv_nsec));
 }

@@ -14,7 +14,8 @@
 #include <string>
 #include <bitset>
 
-const int ALPHABET_SIZE = 300;
+const int ALPHABET_SIZE = 20;
+//const int ALPHABET_SIZE = 300;
 
 class Posting {
 public:
